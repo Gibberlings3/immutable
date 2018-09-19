@@ -1,0 +1,171 @@
+////////////////////////////////////////////////////////////////////////////////////////////
+/// The BACKUP directory has to be ~%external_loc%/backup/%mod_root%, as defined later
+///
+/// Because BACKUP is read first, it has to be hardcoded
+////////////////////////////////////////////////////////////////////////////////////////////
+BACKUP ~weidu_external/backup/mymod~
+
+////////////////////////////////////////////////////////////////////////////////////////////
+/// This is all standard (but the immutability function library assumes AUTO_EVAL_STRINGS
+/// so it needs to be set)
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+AUTHOR ~For help troubleshooting installation problems, go to the Sword Coast Stratagems forum at forums.gibberlings3.net.~
+VERSION ~v32~
+README ~mymod/readme.txt~
+AUTO_EVAL_STRINGS
+
+ALWAYS
+
+////////////////////////////////////////////////////////////////////////////////////////////
+/// Define relevant locations
+///
+/// In 99% of cases you can leave most of these out, because the default values are set, but I'm making
+/// it explicit here for illustration purposes
+////////////////////////////////////////////////////////////////////////////////////////////
+
+   OUTER_SPRINT mod_root mymod
+
+    // set mod_root to your mod directory. If you don't set it, the progam will
+    // assume your mod directory is %TP2_NAME%, i.e. "mymod" if your tp2 file
+    // is "mymod.tp2" or "setup-mymod.tp2". Since that's almost certainly right, you probably
+    // don't need to set mod_root here explicitly.
+
+   OUTER_SPRINT external_loc weidu_external
+
+    // set this to a common location where backups etc can be stored, so we don't clutter
+    // the user directory too much. I suggest "weidu_external", and the program will default
+    // to that if you don't set it explicitly. (SCS and Wheels used stratagems_external but
+    // something more neutral makes sense if others want to share.)
+
+   OUTER_SPRINT tra_base lang
+   
+    // set this to the name of the subfolder in your mod where you store your tra files. "lang"
+    // is pretty common, and is the default value; if you use "lang" you don't need to set this
+    // variable explicitly.
+    
+   OUTER_SPRINT rel_iconv_path "lang/iconv"
+
+    // set this to the location of the "iconv" folder where your iconv program (needed for UTF-8
+    // conversions) lives. By default the program assumes it's in your tra_base folder; if it is
+    // you can leave this blank.
+
+   OUTER_SPRINT base_language "english"
+
+    // set this to a language that is guaranteed to have all strings present. The default assumption
+    // is that this language is English; you don't need to set base_language if that's true.
+    
+   OUTER_SPRINT tra_setup "setup"
+   
+    // set this to the name of the tra file where your setup strings (component names and the like) live.
+    // The default assumption is that they live in "setup.tra".
+
+   OUTER_SPRINT ini_file "config"
+
+    // Unless you leave this blank, the program will look in "%inifile%.ini" for your ini-type configuration
+    // options (which can be used for debugging or fine-tuning). 
+    
+   OUTER_SPRINT user_ini_file "user-config"
+   
+   // If "%user_config%.ini" exists, the program will also check it for ini entries, and those will supersede
+   // those in "%inifile%.ini". The file "%user_config%.ini" *should not exist* in your own install; it's for
+   // end users to preserve their ini settings after reinstall. (This is ALIENQuake's proposal.)
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+/// Include DavidW's library of immutable-installation functions
+///
+/// If you've put it somewhere other than mymod/lib you'll need to edit this
+////////////////////////////////////////////////////////////////////////////////////////////
+
+  INCLUDE "%mod_root%/lib/sfo_immutable.tph"
+
+////////////////////////////////////////////////////////////////////////////////////////////
+/// Include your own "run-always" code, which should include TRA loading - see the sample.
+///
+/// (You could put this in the tp2 directly here, but I find that untidy.)
+////////////////////////////////////////////////////////////////////////////////////////////
+
+  INCLUDE "%mod_root%/lib/always.tph"
+
+
+END
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////	Language section
+////
+////    The links here again have to be hardcoded (no variables). 
+////    The base structure should look like this template, with the 
+////    variable values filled in manually:
+////
+////
+////    LANGUAGE
+////    "Francais"
+////    FRENCH
+////
+////    "[mod_root]/[tra_base]/[base_language]/[tra_setup].tra"
+////    "[external_loc]/lang/[mod_root]/[base_language]/[tra_setup].tra"
+////    "[mod_root]/[tra_base]/french/[tra_setup].tra"
+////    "[external_loc]/lang/[mod_root]/french/[tra_setup].tra"
+////
+////
+////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+LANGUAGE
+"English"
+ENGLISH
+ 
+ ~mymod/lang/english/setup.tra~
+ ~weidu_external/lang/mymod/english/setup.tra~
+
+LANGUAGE
+"Francais"
+FRENCH
+ ~mymod/lang/english/setup.tra~
+ ~weidu_external/lang/mymod/english/setup.tra~
+ ~mymod/lang/french/setup.tra~
+ ~weidu_external/lang/mymod/french/setup.tra~
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////	Components start here
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+////	First component: demonstrates some points of design
+////////////////////////////////////////////////////////////////////
+
+BEGIN @1 DESIGNATED 1000
+
+    /// the usual preamble: BEGIN, DESIGNATED, REQUIRE_COMPONENT etc
+
+LAF run STR_VAR file=core_component file_loc=components tra=core_component END
+
+    /// This program looks for "%file%.tpa" in location "%mod_root%/%file_loc%".
+    /// If it's not found, the install fails. If it's found, it's INCLUDEd and
+    /// the program attempts to run "%file_loc%" as an ACTION_FUNCTION
+    /// with tra file "%tra%.tra".
+
+    /// In my preferred layout, the *only* thing in the component is the preamble
+    /// and this function call (or, occasionally, a more complicated INCLUDE and
+    /// function call. But you don't have to code that way; you can just put TP2
+    /// here if you like.
+
+////////////////////////////////////////////////////////////////////
+////	Second component: demonstrates subcomponent structure and another
+////    couple of design points
+////
+////    In particular, we're using the "version" argument to fine-tune the component
+////    function.
+////////////////////////////////////////////////////////////////////
+
+BEGIN @3 SUBCOMPONENT @2 DESIGNATED 2000
+
+LAF run STR_VAR file=second_component file_loc=components tra=second_component version=1 END
+
+BEGIN @4 SUBCOMPONENT @2 DESIGNATED 2001
+
+LAF run STR_VAR file=second_component file_loc=components tra=second_component version=2 END

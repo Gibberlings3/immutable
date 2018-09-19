@@ -1,0 +1,112 @@
+//////////////////////////////////////////////////////////////////////////
+////    This file needs to contain a function with the same name as the file
+////    itself - this function contains the TP2 code for the component.
+//////////////////////////////////////////////////////////////////////////
+
+DEFINE_ACTION_FUNCTION core_component BEGIN
+
+     //////////////////////////////////////////////////////////////////////////
+     // do something ordinary, to make the point that this is just TP2
+     //////////////////////////////////////////////////////////////////////////
+
+     COPY_EXISTING "duecla01.cre" "override"
+        WRITE_BYTE 0x273 7
+
+     //////////////////////////////////////////////////////////////////////////
+     // use a string from this component's bespoke tra file
+     //////////////////////////////////////////////////////////////////////////
+
+     PRINT @1
+
+     //////////////////////////////////////////////////////////////////////////
+     // use a bespoke function for this component
+     //////////////////////////////////////////////////////////////////////////
+
+     LAF make_elven STR_VAR creature=duecla01 END
+
+     //////////////////////////////////////////////////////////////////////////
+     // manually load in a tra file and use a string from that
+     //////////////////////////////////////////////////////////////////////////
+
+     WITH_TRA "%tra_loc%/english/bespoke.tra" "%tra_loc%/%LANGUAGE%/bespoke.tra" BEGIN
+        PRINT @1
+     END
+
+     //////////////////////////////////////////////////////////////////////////
+     // use a function from the shared list
+     //////////////////////////////////////////////////////////////////////////
+
+     LAF make_hostile STR_VAR creature=duecla01 END
+
+     //////////////////////////////////////////////////////////////////////////
+     // use a string from the shared tra file
+     //////////////////////////////////////////////////////////////////////////
+
+     PRINT @100001
+
+     //////////////////////////////////////////////////////////////////////////
+     // put a file in the workspace and do something with it (only ever use the workspace for temporary building,
+     // compiling etc - don't store things there and expect them to be there later)
+     //////////////////////////////////////////////////////////////////////////
+
+     COPY_EXISTING "wtasight.bcs" "%workspace%/wtasight.baf"
+        DECOMPILE_BCS_TO_BAF
+
+     ACTION_FOR_EACH shout IN 112 113 BEGIN
+        COPY "%workspace%/wtasight.baf" "override/wta_%shout%.bcs"
+           REPLACE_TEXTUALLY 111 "%shout%"
+           COMPILE_BAF_TO_BCS
+     END
+
+     //////////////////////////////////////////////////////////////////////////
+     // put a file in your mod's data store (this is unique to your mod so you
+     // can do what you like with it)
+     //////////////////////////////////////////////////////////////////////////
+
+     COPY ".../stratagems-inline/blank" "%external_data%/list_of_op_spells.txt"  // ".../stratagems-inline/blank" is predefined and does just what you'd think
+
+     APPEND_OUTER "%external_data%/list_of_op_spells.txt" "WIZARD_ABI_DALZIMS_HORRID_WILTING"
+
+     //////////////////////////////////////////////////////////////////////////
+     // manually create a shared folder in the datastore and put something in it
+     // (make sure the folder has your modder prefix)
+     //////////////////////////////////////////////////////////////////////////
+
+     MKDIR "%external_loc%/data/dw#shared_data"
+
+     COPY ".../stratagems-inline/blank" "%external_loc%/data/dw#shared_data/list_of_up_spells.txt" 
+
+     APPEND_OUTER "%external_loc%/data/dw#shared_data/list_of_up_spells.txt" "WIZARD_BIGBYS_CLENCHED_FIST [this file could be read or edited by another of my mods]"
+
+
+     //////////////////////////////////////////////////////////////////////////
+     // put a marker file in the marker store (this is shared, so use a modder prefix)
+     //////////////////////////////////////////////////////////////////////////
+
+     LAF make_label STR_VAR label=dw#sample_marker END  // creates "dw#sample_marker.mrk" in weidu_external/markers
+
+     //////////////////////////////////////////////////////////////////////////
+     // check the value of the ini variable
+     //////////////////////////////////////////////////////////////////////////
+
+     LAF check_ini STR_VAR ini=number_of_scs_versions RET value END
+     
+     PRINT "Apparently there have been %value% versions of SCS"
+
+END
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+////    Secondary functions used by this component (and no other) can
+////    go here
+//////////////////////////////////////////////////////////////////////////
+
+DEFINE_ACTION_FUNCTION make_elven
+     STR_VAR creature=""
+BEGIN
+     COPY_EXISTING "%creature%.cre" override
+         WRITE_BYTE 0x272 2
+     BUT_ONLY
+END

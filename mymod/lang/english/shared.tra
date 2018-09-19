@@ -1,0 +1,6 @@
+/// this file is loaded by every component and so should contain strings used by multiple components.
+///
+/// to avoid namespace conflicts, use numbers >100,000
+
+
+@100001 = "Ilyich is now Allegiance: Enemy. (This string is accessible from every component)"
