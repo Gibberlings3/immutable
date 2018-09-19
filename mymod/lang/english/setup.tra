@@ -1,0 +1,6 @@
+/// this file is ONLY for strings used in the setup process, e.g. component names and don't-install-this warnings
+
+@1 = "First component"
+@2 = "Second component"
+@3 = "Subcomponent A: messes with Ilyich again"
+@4 = "Subcomponent B: checks for the presence of the marker we placed in component 1"
