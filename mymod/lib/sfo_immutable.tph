@@ -41,7 +41,7 @@ BEGIN
    ACTION_IF enhanced_edition BEGIN
        OUTER_SPRINT tra_loc "%external_loc%/lang/%mod_root%"
        ACTION_IF (!FILE_EXISTS "%tra_loc%/languages_installed.mrk"  || force_tra_rebuild) BEGIN
-          COPY ".../stratagems-inline/blank" "override/%tra_loc%/languages_installed.mrk"
+          COPY ".../stratagems-inline/blank" "%tra_loc%/languages_installed.mrk"
           MKDIR "%tra_loc%/%base_language%"
           MKDIR "%tra_loc%/%LANGUAGE%"
           ACTION_BASH_FOR "%mod_root%/%tra_base%/%LANGUAGE%" ".*\.tra" BEGIN
